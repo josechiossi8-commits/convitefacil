@@ -3,7 +3,7 @@ const enc = new TextEncoder();
 export const HEADERS = {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
 export const reply = (data, status=200) => new Response(JSON.stringify(data), {status,headers:HEADERS});
 export function guard(request, env) {
-  const secret=env.TEST_ACCESS_SECRET, token=env.MP_TEST_ACCESS_TOKEN_PAI;
+  const secret=env.TEST_ACCESS_SECRET_PAI, token=env.MP_TEST_ACCESS_TOKEN_PAI;
   if (typeof secret !== 'string' || secret.length < 32 || typeof token !== 'string' || !token || secret === token || env.MP_TEST_CONFIRMED !== 'yes') return reply({error:'Teste não configurado'},503);
   if (request.headers.get('Origin') !== new URL(request.url).origin || !/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type') || '')) return reply({error:'Origem ou formato inválido'},403);
   return null;
@@ -11,7 +11,7 @@ export function guard(request, env) {
 export async function authorized(request, env) {
   // Comparar hashes de comprimento fixo antes de liberar o endpoint.
   const given = request.headers.get('Authorization') || '';
-  const expected = 'Bearer '+env.TEST_ACCESS_SECRET;
+  const expected = 'Bearer '+env.TEST_ACCESS_SECRET_PAI;
   const [a,b]=await Promise.all([crypto.subtle.digest('SHA-256',enc.encode(given)),crypto.subtle.digest('SHA-256',enc.encode(expected))]);
   const x=new Uint8Array(a), y=new Uint8Array(b); let diff=0; for(let i=0;i<x.length;i++) diff|=x[i]^y[i]; return diff===0;
 }
@@ -21,12 +21,12 @@ export async function readJson(request) {
 }
 const b64url = bytes => btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 export async function sign(env, id, ref) {
-  const msg=b64url(enc.encode(JSON.stringify({id,ref}))); const key=await crypto.subtle.importKey('raw',enc.encode(env.TEST_ACCESS_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  const msg=b64url(enc.encode(JSON.stringify({id,ref}))); const key=await crypto.subtle.importKey('raw',enc.encode(env.TEST_ACCESS_SECRET_PAI),{name:'HMAC',hash:'SHA-256'},false,['sign']);
   return msg+'.'+b64url(new Uint8Array(await crypto.subtle.sign('HMAC',key,enc.encode(msg))));
 }
 export async function verify(env, receipt) {
   try { if(typeof receipt!=='string'||receipt.length>1024) return null; const [msg,sig,extra]=receipt.split('.'); if(extra||!msg||!sig) return null;
-    const key=await crypto.subtle.importKey('raw',enc.encode(env.TEST_ACCESS_SECRET),{name:'HMAC',hash:'SHA-256'},false,['verify']);
+    const key=await crypto.subtle.importKey('raw',enc.encode(env.TEST_ACCESS_SECRET_PAI),{name:'HMAC',hash:'SHA-256'},false,['verify']);
     const raw=Uint8Array.from(atob(sig.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
     if(!await crypto.subtle.verify('HMAC',key,raw,enc.encode(msg))) return null;
     const o=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(msg.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0))));
