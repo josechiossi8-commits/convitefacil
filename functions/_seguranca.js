@@ -3,7 +3,7 @@ const enc = new TextEncoder();
 export const HEADERS = {'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'};
 export const reply = (data, status=200) => new Response(JSON.stringify(data), {status,headers:HEADERS});
 export function guard(request, env) {
-  const secret=env.TEST_ACCESS_SECRET, token=env.MP_TEST_ACCESS_TOKEN;
+  const secret=env.TEST_ACCESS_SECRET, token=env.MP_TEST_ACCESS_TOKEN_PAI;
   if (typeof secret !== 'string' || secret.length < 32 || typeof token !== 'string' || !token || secret === token || env.MP_TEST_CONFIRMED !== 'yes') return reply({error:'Teste não configurado'},503);
   if (request.headers.get('Origin') !== new URL(request.url).origin || !/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type') || '')) return reply({error:'Origem ou formato inválido'},403);
   return null;
