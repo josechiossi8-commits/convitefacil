@@ -1,0 +1,12 @@
+#cf-apk-open { background:#16833e; color:#fff; border:0; border-radius:7px; padding:14px 20px; font-size:14px; font-weight:700; min-height:44px; cursor:pointer; }
+.cf-apk-entry { margin-top:18px; }
+#cf-apk-open:hover, #cf-apk-yes:hover { background:#126e34; }
+#cf-apk-dialog { width:min(90vw,400px); padding:24px; border:0; border-radius:14px; background:#fff; color:#202820; box-shadow:0 12px 45px #0005; }
+#cf-apk-dialog::backdrop { background:rgba(0,0,0,.55); }
+#cf-apk-dialog h2 { margin:0 0 12px; font-size:22px; }
+#cf-apk-dialog p { margin:0 0 20px; color:#333; }
+#cf-apk-dialog .cf-apk-actions { display:flex; justify-content:flex-end; gap:12px; }
+#cf-apk-dialog button { border:0; border-radius:7px; padding:12px 20px; min-width:75px; min-height:44px; font-weight:700; cursor:pointer; }
+#cf-apk-no { background:#e9eee9; color:#263c2a; }
+#cf-apk-yes { background:#16833e; color:#fff; }
+#cf-apk-dialog button:focus-visible, #cf-apk-open:focus-visible { outline:3px solid #184bc5; outline-offset:3px; }
